@@ -33,6 +33,7 @@
     overflow-x:hidden;
     min-height:100vh;
   }
+  #lg-root{ position:relative; min-height:100vh; }
   #bg{
     position:fixed; inset:0; z-index:-3;
     background:
@@ -59,15 +60,14 @@
     position:sticky; top:0; z-index:50;
     display:flex; align-items:center; justify-content:space-between;
     padding:16px 6vw;
-    background: rgba(6,7,13,0.42);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
     border-bottom:1px solid rgba(255,255,255,0.08);
-    transition: padding .3s var(--ease), background .3s var(--ease);
+    transition: padding .3s var(--ease);
+    color:var(--text);
   }
-  nav.scrolled{ padding:10px 6vw; background:rgba(6,7,13,0.65); }
-  .brand{ font-weight:700; font-size:1.15rem; letter-spacing:-0.02em; display:flex; gap:10px; align-items:center;}
+  nav.scrolled{ padding:10px 6vw; }
+  .brand{ font-weight:700; font-size:1.15rem; letter-spacing:-0.02em; display:flex; gap:10px; align-items:center; position:relative; z-index:2;}
   .brand .dot{ width:9px; height:9px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 0 14px var(--accent2);}
+  nav .links{ position:relative; z-index:2; }
   nav a{ color:var(--muted); text-decoration:none; margin-left:30px; font-size:0.9rem; font-weight:500; transition:color .2s ease;}
   nav a:hover{ color:var(--text); }
 
@@ -174,118 +174,131 @@
   }
   footer .rat-icon{ font-size:1.3rem; }
 
+  #ratFab{
+    position:fixed; right:28px; bottom:28px; z-index:60;
+    width:64px; height:64px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.8rem; color:#04050a; cursor:grab;
+    user-select:none;
+  }
+
   @media (max-width:640px){
     nav a{ margin-left:16px; font-size:0.8rem; }
     section{ padding:66px 0; }
+    #ratFab{ width:52px; height:52px; font-size:1.4rem; right:18px; bottom:18px; }
   }
 </style>
 </head>
 <body>
-<div id="bg"></div>
-<div id="grain"></div>
-<canvas id="rats"></canvas>
+<div id="lg-root">
+  <div id="bg" data-dynamic></div>
+  <div id="grain"></div>
+  <canvas id="rats"></canvas>
 
-<nav id="nav">
-  <div class="brand"><span class="dot"></span> RATLABS</div>
-  <div>
-    <a href="#math">Research</a>
-    <a href="#team">Team</a>
-    <a href="#contact">Contact</a>
-  </div>
-</nav>
-
-<main>
-  <section class="hero">
-    <div class="badge">🐀 Rodent-Grade Infrastructure · Est. 2026</div>
-    <h1 class="title">Engineering the<br>future, one rat at a time.</h1>
-    <p class="sub">RATLABS is a fictional research collective operating out of <strong>paidll.tech</strong>, combining liquid-glass interfaces, applied rodent mathematics, and an unreasonable number of rats.</p>
-    <div class="cta-row">
-      <a class="btn primary" href="#math">Explore the math</a>
-      <a class="btn ghost" href="#team">Meet the rats</a>
+  <nav id="nav" class="lg-glass" data-config='{"blurAmount":0.55,"refraction":0.35,"chromAberration":0.04,"edgeHighlight":0.06,"specular":0.1,"fresnel":0.4,"cornerRadius":0,"saturation":0.15,"tintStrength":0.04,"opacity":0.92,"shadowOpacity":0.2,"shadowOffsetY":2}'>
+    <div class="brand"><span class="dot"></span> RATLABS</div>
+    <div class="links">
+      <a href="#math">Research</a>
+      <a href="#team">Team</a>
+      <a href="#contact">Contact</a>
     </div>
-  </section>
+  </nav>
 
-  <section id="math">
-    <h2 class="section-title reveal">Applied Rat Mathematics</h2>
-    <p class="section-sub reveal">A small selection of equations governing rodent population dynamics, distribution, and vibes.</p>
-    <div class="math-grid">
-      <div class="glass math-card reveal">
-        <h3>Logistic Rat Growth</h3>
-        <div class="eq" id="eq1"></div>
-        <p>Population growth rate slows as the colony approaches carrying capacity K.</p>
-      </div>
-      <div class="glass math-card reveal">
-        <h3>Rat Distribution Function</h3>
-        <div class="eq" id="eq2"></div>
-        <p>Gaussian spread describing how densely rats cluster around the mean rat.</p>
-      </div>
-      <div class="glass math-card reveal">
-        <h3>Euler's Rat Identity</h3>
-        <div class="eq" id="eq3"></div>
-        <p>Five fundamental constants, zero rats, yet somehow it still feels relevant.</p>
-      </div>
-      <div class="glass math-card reveal">
-        <h3>Whisker Wave Equation</h3>
-        <div class="eq" id="eq4"></div>
-        <p>Describes propagation of vibration through an idealized rat whisker.</p>
-      </div>
-    </div>
-  </section>
+  <div id="ratFab" class="lg-glass" data-config='{"blurAmount":0.2,"refraction":0.9,"chromAberration":0.12,"edgeHighlight":0.2,"specular":0.6,"fresnel":1.0,"distortion":0.05,"cornerRadius":40,"zRadius":40,"bevelMode":1,"floating":true,"button":true,"saturation":0.3,"shadowOpacity":0.35,"shadowSpread":16}'>🐀</div>
 
-  <section>
-    <h2 class="section-title reveal">By the numbers</h2>
-    <p class="section-sub reveal">Metrics we made up, but rendered beautifully.</p>
-    <div class="stats">
-      <div class="glass stat reveal"><div class="num">220+</div><div class="label">Rats deployed</div></div>
-      <div class="glass stat reveal"><div class="num">99.9%</div><div class="label">Uptime, allegedly</div></div>
-      <div class="glass stat reveal"><div class="num">∞</div><div class="label">Cheese reserves</div></div>
-      <div class="glass stat reveal"><div class="num">0</div><div class="label">Real employees</div></div>
-    </div>
-  </section>
+  <main>
+    <section class="hero">
+      <div class="badge">🐀 Rodent-Grade Infrastructure · Est. 2026</div>
+      <h1 class="title">Engineering the<br>future, one rat at a time.</h1>
+      <p class="sub">RATLABS is a fictional research collective operating out of <strong>paidll.tech</strong>, combining liquid-glass interfaces, applied rodent mathematics, and an unreasonable number of rats.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#math">Explore the math</a>
+        <a class="btn ghost" href="#team">Meet the rats</a>
+      </div>
+    </section>
 
-  <section id="team">
-    <h2 class="section-title reveal">Rat Contacts</h2>
-    <p class="section-sub reveal">Entirely fictional team, entirely real enthusiasm.</p>
-    <div class="team-grid">
-      <div class="glass rat-card reveal">
-        <div class="avatar">🐀</div>
-        <h4>Dr. Whisker Chen</h4>
-        <div class="role">Chief Rodent Officer</div>
-        <div class="email">whisker@paidll.tech</div>
+    <section id="math">
+      <h2 class="section-title reveal">Applied Rat Mathematics</h2>
+      <p class="section-sub reveal">A small selection of equations governing rodent population dynamics, distribution, and vibes.</p>
+      <div class="math-grid">
+        <div class="glass math-card reveal">
+          <h3>Logistic Rat Growth</h3>
+          <div class="eq" id="eq1"></div>
+          <p>Population growth rate slows as the colony approaches carrying capacity K.</p>
+        </div>
+        <div class="glass math-card reveal">
+          <h3>Rat Distribution Function</h3>
+          <div class="eq" id="eq2"></div>
+          <p>Gaussian spread describing how densely rats cluster around the mean rat.</p>
+        </div>
+        <div class="glass math-card reveal">
+          <h3>Euler's Rat Identity</h3>
+          <div class="eq" id="eq3"></div>
+          <p>Five fundamental constants, zero rats, yet somehow it still feels relevant.</p>
+        </div>
+        <div class="glass math-card reveal">
+          <h3>Whisker Wave Equation</h3>
+          <div class="eq" id="eq4"></div>
+          <p>Describes propagation of vibration through an idealized rat whisker.</p>
+        </div>
       </div>
-      <div class="glass rat-card reveal">
-        <div class="avatar">🐁</div>
-        <h4>Ratatouille Dubois</h4>
-        <div class="role">Head of Culinary Ops</div>
-        <div class="email">rata@paidll.tech</div>
-      </div>
-      <div class="glass rat-card reveal">
-        <div class="avatar">🧀</div>
-        <h4>Ben Rattington</h4>
-        <div class="role">Lead Infrastructure Rat</div>
-        <div class="email">ben@paidll.tech</div>
-      </div>
-      <div class="glass rat-card reveal">
-        <div class="avatar">🐀</div>
-        <h4>Squeak Nakamura</h4>
-        <div class="role">Director of Tail Dynamics</div>
-        <div class="email">squeak@paidll.tech</div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="contact">
-    <div class="glass reveal" style="padding:56px; text-align:center;">
-      <h2 class="section-title" style="margin-bottom:12px;">Get in touch</h2>
-      <p class="section-sub" style="margin:0 auto 30px;">All inquiries are read by rats and answered by nobody.</p>
-      <a class="btn primary" href="mailto:hello@paidll.tech">hello@paidll.tech</a>
-    </div>
-  </section>
-</main>
+    <section>
+      <h2 class="section-title reveal">By the numbers</h2>
+      <p class="section-sub reveal">Metrics we made up, but rendered beautifully.</p>
+      <div class="stats">
+        <div class="glass stat reveal"><div class="num">220+</div><div class="label">Rats deployed</div></div>
+        <div class="glass stat reveal"><div class="num">99.9%</div><div class="label">Uptime, allegedly</div></div>
+        <div class="glass stat reveal"><div class="num">∞</div><div class="label">Cheese reserves</div></div>
+        <div class="glass stat reveal"><div class="num">0</div><div class="label">Real employees</div></div>
+      </div>
+    </section>
 
-<footer>
-  <span class="rat-icon">🐀</span> RATLABS — hosted on paidll.tech — no rats were harmed, several were rendered
-</footer>
+    <section id="team">
+      <h2 class="section-title reveal">Rat Contacts</h2>
+      <p class="section-sub reveal">Entirely fictional team, entirely real enthusiasm.</p>
+      <div class="team-grid">
+        <div class="glass rat-card reveal">
+          <div class="avatar">🐀</div>
+          <h4>Dr. Whisker Chen</h4>
+          <div class="role">Chief Rodent Officer</div>
+          <div class="email">whisker@paidll.tech</div>
+        </div>
+        <div class="glass rat-card reveal">
+          <div class="avatar">🐁</div>
+          <h4>Ratatouille Dubois</h4>
+          <div class="role">Head of Culinary Ops</div>
+          <div class="email">rata@paidll.tech</div>
+        </div>
+        <div class="glass rat-card reveal">
+          <div class="avatar">🧀</div>
+          <h4>Ben Rattington</h4>
+          <div class="role">Lead Infrastructure Rat</div>
+          <div class="email">ben@paidll.tech</div>
+        </div>
+        <div class="glass rat-card reveal">
+          <div class="avatar">🐀</div>
+          <h4>Squeak Nakamura</h4>
+          <div class="role">Director of Tail Dynamics</div>
+          <div class="email">squeak@paidll.tech</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="glass reveal" style="padding:56px; text-align:center;">
+        <h2 class="section-title" style="margin-bottom:12px;">Get in touch</h2>
+        <p class="section-sub" style="margin:0 auto 30px;">All inquiries are read by rats and answered by nobody.</p>
+        <a class="btn primary" href="mailto:hello@paidll.tech">hello@paidll.tech</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span class="rat-icon">🐀</span> RATLABS — hosted on paidll.tech — no rats were harmed, several were rendered
+  </footer>
+</div>
 
 <script>
 window.addEventListener('load', () => {
@@ -353,6 +366,17 @@ function tick(){
   requestAnimationFrame(tick);
 }
 tick();
+
+window.addEventListener('load', async () => {
+  try {
+    const { LiquidGlass } = await import('https://cdn.jsdelivr.net/npm/@ybouane/liquidglass/dist/index.js');
+    const root = document.getElementById('lg-root');
+    const glassElements = root.querySelectorAll('.lg-glass');
+    await LiquidGlass.init({ root, glassElements });
+  } catch (e) {
+    console.warn('LiquidGlass unavailable, falling back to CSS glass.', e);
+  }
+});
 </script>
 </body>
 </html>
