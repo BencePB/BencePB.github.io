@@ -3,22 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>???</title>
+<title>🐀🐀🐀</title>
 <style>
-  html, body { height:100%; margin:0; }
-  body { display:flex; align-items:center; justify-content:center; background:#0d1117; color:#c9d1d9; font-family:-apple-system, Segoe UI, Roboto, sans-serif; }
-  .card { text-align:center; }
-  h1 { font-size: 1.6em; color:#58a6ff; margin-bottom: 0.3em; }
-  p { color:#8b949e; margin-top:0; }
+  html, body { height:100%; margin:0; overflow:hidden; background:#0d1117; position:relative; }
+  .rat {
+    position:absolute;
+    user-select:none;
+    animation: wiggle 1s infinite alternate ease-in-out;
+    will-change: transform;
+  }
+  @keyframes wiggle {
+    from { transform: var(--base-rot) scale(0.95); }
+    to { transform: var(--base-rot) scale(1.08); }
+  }
+  .center {
+    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    text-align:center; z-index:10; background:rgba(13,17,23,0.9);
+    padding:30px 40px; border-radius:16px; border:2px solid #58a6ff;
+    font-family:-apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  h1 { color:#58a6ff; font-size:1.6em; margin-bottom:0.3em; }
+  p { color:#c9d1d9; margin-top:0; }
   button { font-size: 1.3em; padding: 16px 36px; border-radius: 10px; border: none; background:#238636; color:white; cursor:pointer; transition: transform 0.15s ease, background 0.15s ease; }
   button:hover { background:#2ea043; transform: scale(1.05); }
 </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Do not click this button</h1>
+  <div id="ratField"></div>
+  <div class="center">
+    <h1>🐀 Do not click this button 🐀</h1>
     <p>Seriously. Don't.</p>
     <button onclick="window.location.href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'">Click here</button>
   </div>
+  <script>
+    const field = document.getElementById('ratField');
+    const count = 220;
+    for (let i = 0; i < count; i++) {
+      const span = document.createElement('span');
+      span.className = 'rat';
+      span.textContent = '🐀';
+      const size = 14 + Math.random() * 70;
+      const top = Math.random() * 100;
+      const left = Math.random() * 100;
+      const rot = Math.random() * 360;
+      span.style.fontSize = size + 'px';
+      span.style.top = top + 'vh';
+      span.style.left = left + 'vw';
+      span.style.setProperty('--base-rot', 'rotate(' + rot + 'deg)');
+      span.style.animationDelay = (Math.random() * 1) + 's';
+      span.style.opacity = 0.7 + Math.random() * 0.3;
+      field.appendChild(span);
+    }
+  </script>
 </body>
 </html>
