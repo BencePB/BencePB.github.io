@@ -148,7 +148,12 @@
   .math-card{ padding:30px; }
   .math-card:hover{ transform:translateY(-8px); border-color:rgba(142,200,255,0.5); }
   .math-card h3{ margin-top:0; font-size:1.02rem; color:var(--accent); font-weight:600; letter-spacing:-0.01em;}
-  .math-card .eq{ font-size:1.15rem; margin:20px 0 12px; overflow-x:auto; color:var(--text); }
+  .math-card .eq{
+    font-size:1.15rem; margin:20px 0 12px; color:var(--text);
+    overflow-x:auto; overflow-y:hidden;
+    scrollbar-width:none; -ms-overflow-style:none;
+  }
+  .math-card .eq::-webkit-scrollbar{ display:none; height:0; width:0; }
   .math-card p{ color:var(--muted); font-size:0.88rem; margin:0; line-height:1.5;}
 
   .team-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:20px; }
