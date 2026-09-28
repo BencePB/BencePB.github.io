@@ -33,6 +33,21 @@
     overflow-x:hidden;
     min-height:100vh;
   }
+  .skip-link{
+    position:fixed;
+    top:14px;
+    left:14px;
+    z-index:100;
+    padding:10px 14px;
+    border-radius:12px;
+    background:#f2f5f8;
+    color:#04050a;
+    font-weight:600;
+    text-decoration:none;
+    transform:translateY(-150%);
+    transition:transform .2s ease;
+  }
+  .skip-link:focus{ transform:translateY(0); }
   #lg-root{ position:relative; min-height:100vh; overflow:hidden; }
   #bg{
     position:fixed; inset:0; z-index:-3;
@@ -87,11 +102,16 @@
   nav.scrolled{ padding:10px 6vw; }
   .brand{ font-weight:700; font-size:1.15rem; letter-spacing:-0.02em; display:flex; gap:10px; align-items:center;}
   .brand .dot{ width:9px; height:9px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:0 0 14px var(--accent2);}
+  .links{ display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; row-gap:8px; }
   nav a{ color:var(--muted); text-decoration:none; margin-left:30px; font-size:0.9rem; font-weight:500; transition:color .2s ease;}
   nav a:hover{ color:var(--text); }
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+  }
 
   main{ padding: 0 6vw; }
-  section{ padding: 100px 0; max-width:1180px; margin:0 auto; }
+  section{ padding: 100px 0; max-width:1180px; margin:0 auto; scroll-margin-top:90px; }
 
   .hero{ text-align:center; padding-top:140px; }
   .badge{
@@ -189,24 +209,41 @@
     font-size:1.8rem; cursor:grab; user-select:none;
     touch-action:none;
     transition: transform .15s ease;
+    border:1px solid var(--glass-border);
+    color:var(--text);
+    background:var(--glass-bg);
   }
   #ratFab:active{ cursor:grabbing; transform:scale(0.92); }
   #ratFab.dragging{ transition:none; }
 
   @media (max-width:640px){
-    nav a{ margin-left:16px; font-size:0.8rem; }
+    nav.liquid-glass{ align-items:flex-start; gap:10px; }
+    .links{ justify-content:flex-start; }
+    nav a{ margin-left:0; margin-right:16px; font-size:0.8rem; }
     section{ padding:66px 0; }
+    .hero p.sub{ font-size:1rem; }
     #ratFab{ width:52px; height:52px; font-size:1.4rem; right:16px; bottom:16px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *, *::before, *::after{
+      animation-duration:0.01ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:0.01ms !important;
+    }
+    #rats, #grain{ display:none; }
+    .reveal{ opacity:1; transform:none; }
   }
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <div id="lg-root">
-  <div id="bg"></div>
-  <div id="grain"></div>
-  <canvas id="rats"></canvas>
+  <div id="bg" aria-hidden="true"></div>
+  <div id="grain" aria-hidden="true"></div>
+  <canvas id="rats" aria-hidden="true"></canvas>
 
-  <nav id="nav" class="liquid-glass">
+  <nav id="nav" class="liquid-glass" aria-label="Primary">
     <div class="brand"><span class="dot"></span> RATLABS</div>
     <div class="links">
       <a href="#math">Research</a>
@@ -215,9 +252,9 @@
     </div>
   </nav>
 
-  <div id="ratFab" class="liquid-glass" title="Drag me">🐀</div>
+  <button id="ratFab" class="liquid-glass" title="Drag me or click to jump to top" aria-label="Drag or jump to top">🐀</button>
 
-  <main>
+  <main id="main">
     <section class="hero">
       <div class="badge">🐀 Rodent-Grade Infrastructure · Est. 2026</div>
       <h1 class="title">Engineering the<br>future, one rat at a time.</h1>
@@ -322,14 +359,19 @@ window.addEventListener('load', () => {
 });
 
 const navEl = document.getElementById('nav');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 window.addEventListener('scroll', () => {
   navEl.classList.toggle('scrolled', window.scrollY > 20);
 }, { passive: true });
 
-const io = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
-}, { threshold: 0.15 });
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+if (prefersReducedMotion) {
+  document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+} else {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+}
 
 const canvas = document.getElementById('rats');
 const ctx = canvas.getContext('2d');
@@ -337,6 +379,7 @@ let W, H;
 function resize(){
   W = canvas.width = window.innerWidth;
   H = canvas.height = window.innerHeight;
+  clampFabPosition();
 }
 window.addEventListener('resize', resize);
 resize();
@@ -376,22 +419,40 @@ function tick(){
   }
   requestAnimationFrame(tick);
 }
-tick();
+if (!prefersReducedMotion) tick();
 
 const fab = document.getElementById('ratFab');
 let dragging = false, offsetX = 0, offsetY = 0;
+let pointerStartX = 0, pointerStartY = 0, moved = false;
+
+function clampFabPosition(){
+  if (!fab.style.left || !fab.style.top) return;
+  const size = fab.getBoundingClientRect();
+  const maxX = Math.max(0, window.innerWidth - size.width);
+  const maxY = Math.max(0, window.innerHeight - size.height);
+  const x = Math.min(maxX, Math.max(0, parseFloat(fab.style.left)));
+  const y = Math.min(maxY, Math.max(0, parseFloat(fab.style.top)));
+  fab.style.left = x + 'px';
+  fab.style.top = y + 'px';
+}
+
 fab.addEventListener('pointerdown', (e) => {
   dragging = true;
+  moved = false;
   fab.classList.add('dragging');
   fab.setPointerCapture(e.pointerId);
+  pointerStartX = e.clientX;
+  pointerStartY = e.clientY;
   const rect = fab.getBoundingClientRect();
   offsetX = e.clientX - rect.left;
   offsetY = e.clientY - rect.top;
 });
 fab.addEventListener('pointermove', (e) => {
   if (!dragging) return;
-  const x = e.clientX - offsetX;
-  const y = e.clientY - offsetY;
+  if (Math.abs(e.clientX - pointerStartX) > 4 || Math.abs(e.clientY - pointerStartY) > 4) moved = true;
+  const rect = fab.getBoundingClientRect();
+  const x = Math.min(window.innerWidth - rect.width, Math.max(0, e.clientX - offsetX));
+  const y = Math.min(window.innerHeight - rect.height, Math.max(0, e.clientY - offsetY));
   fab.style.left = x + 'px';
   fab.style.top = y + 'px';
   fab.style.right = 'auto';
@@ -401,9 +462,16 @@ function endDrag(e){
   if (!dragging) return;
   dragging = false;
   fab.classList.remove('dragging');
+  if (!moved) window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
 fab.addEventListener('pointerup', endDrag);
 fab.addEventListener('pointercancel', endDrag);
+fab.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  }
+});
 </script>
 </body>
 </html>
